@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sistema de Cadastro</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+            text-align: center;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            width: 300px;
+            margin: auto;
+            margin-top: 50px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px gray;
+        }
+
+        input {
+            width: 90%;
+            padding: 8px;
+            margin: 5px;
+        }
+
+        button {
+            padding: 8px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        .editar {
+            background: orange;
+        }
+
+        .excluir {
+            background: red;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Cadastro de Usuários</h2>
+
+    <input type="text" id="nome" placeholder="Nome"><br>
+    <input type="email" id="email" placeholder="Email"><br>
+    <input type="number" id="idade" placeholder="Idade"><br>
+
+    <button onclick="cadastrar()">Cadastrar</button>
+
+    <h3>Usuários:</h3>
+    <ul id="lista"></ul>
+</div>
+
+<script>
+let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+let editandoIndex = -1;
+
+function cadastrar() {
+    let nome = document.getElementById("nome").value;
+    let email = document.getElementById("email").value;
+    let idade = document.getElementById("idade").value;
+
+    if(nome === "" || email === "" || idade === "") {
+        alert("Preencha todos os campos!");
+        return;
+    }
+
+    if(editandoIndex === -1) {
+        usuarios.push({ nome, email, idade });
+    } else {
+        usuarios[editandoIndex] = { nome, email, idade };
+        editandoIndex = -1;
+    }
+
+    salvar();
+    atualizarLista();
+    limparCampos();
+}
+
+function atualizarLista() {
+    let lista = document.getElementById("lista");
+    lista.innerHTML = "";
+
+    usuarios.forEach(function(user, index) {
+        let item = `
+            <li>
+                ${user.nome} - ${user.email} - ${user.idade} anos
+                <br>
+                <button class="editar" onclick="editar(${index})">Editar</button>
+                <button class="excluir" onclick="excluir(${index})">Excluir</button>
+            </li>
+        `;
+        lista.innerHTML += item;
+    });
+}
+
+function excluir(index) {
+    usuarios.splice(index, 1);
+    salvar();
+    atualizarLista();
+}
+
+function editar(index) {
+    let user = usuarios[index];
+
+    document.getElementById("nome").value = user.nome;
+    document.getElementById("email").value = user.email;
+    document.getElementById("idade").value = user.idade;
+
+    editandoIndex = index;
+}
+
+function salvar() {
+    localStorage.setItem("usuarios", JSON.stringify(usuarios));
+}
+
+function limparCampos() {
+    document.getElementById("nome").value = "";
+    document.getElementById("email").value = "";
+    document.getElementById("idade").value = "";
+}
+
+// carregar ao abrir
+atualizarLista();
+</script>
+
+</body>
+</html>
